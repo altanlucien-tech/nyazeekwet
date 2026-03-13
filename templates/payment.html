@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upgrade Plan - Glassmorphism</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            background-image: url("/static/images/401f0a2abafc6569d1dbff12b3a8c5e5.jpg"); 
+            background-size: cover; background-position: center;
+            padding: 20px;
+        }
+
+        /* Glassmorphism Card */
+        .payment-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            color: white;
+            text-align: center;
+        }
+
+        /* စာအုပ်အချက်အလက်ပြရန် Style အသစ် */
+        .selected-item-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .selected-item-box img {
+            width: 60px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .payment-card h2 { font-weight: 600; margin-bottom: 10px; font-size: 24px; }
+        .payment-card p { font-size: 14px; opacity: 0.8; margin-bottom: 20px; }
+
+        .payment-methods {
+            display: flex; justify-content: space-around;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+        }
+        .method { text-align: center; font-size: 12px; }
+        .method img { width: 45px; height: 45px; border-radius: 10px; margin-bottom: 5px; display: block; }
+
+        .input-group { text-align: left; margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; margin-bottom: 8px; margin-left: 5px; }
+        
+        .file-upload-wrapper {
+            position: relative;
+            width: 100%; height: 120px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; transition: 0.3s;
+            overflow: hidden;
+        }
+        .file-upload-wrapper:hover { background: rgba(255, 255, 255, 0.1); border-color: #4da3af; }
+        .file-upload-wrapper input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .file-upload-wrapper i { font-size: 30px; color: #4da3af; margin-bottom: 10px; }
+        .file-upload-wrapper span { font-size: 12px; opacity: 0.7; }
+        #file-name { margin-top: 10px; font-size: 11px; color: #4da3af; font-weight: 600; }
+
+        textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 12px;
+            color: white; outline: none; resize: none;
+            font-size: 13px;
+        }
+        textarea:focus { border-color: #4da3af; }
+
+        .pay-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(135deg, #4da3af, #2e6b75);
+            color: white; font-weight: 600; font-size: 16px;
+            cursor: pointer; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(77, 163, 175, 0.3);
+        }
+        .pay-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(77, 163, 175, 0.4); }
+
+        .back-link { display: block; margin-top: 20px; font-size: 12px; color: white; text-decoration: none; opacity: 0.6; }
+        .back-link:hover { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="payment-card">
+        <h2>Confirm Payment</h2>
+        <p>အောက်ပါ နည်းလမ်းများဖြင့် ငွေလွှဲနိုင်ပါသည်။</p>
+
+        {% if target_book %}
+        <div class="selected-item-box">
+            <img src="{{ target_book.cover_image.url }}" alt="Book Cover">
+            <div>
+                <div style="font-size: 14px; font-weight: 600;">{{ target_book.title }}</div>
+                <div style="font-size: 12px; color: #ffd700;">Price: {{ target_book.price }} Ks</div>
+            </div>
+        </div>
+        {% else %}
+        <p style="background: rgba(77, 163, 175, 0.2); padding: 10px; border-radius: 10px; font-size: 13px;">
+            Premium VIP Subscription (30 Days) - 5,000 Ks
+        </p>
+        {% endif %}
+
+        <div class="payment-methods">
+            <div class="method">
+                <img src="https://image.winudf.com/v2/image1/Y29tLmtiemJhbmsubXltYW5leV9pY29uXzE1ODE1ODU5MTJfMDY4/icon.png?w=170&fakeurl=1" alt="KPay">
+                <span>KPay</span>
+            </div>
+            <div class="method">
+                <img src="https://www.wavemoney.com.mm/static/wave_logo-4e7806f47053e87494f6f89765320563.png" alt="Wave">
+                <span>Wave</span>
+            </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="target_book_id" value="{{ target_book.id }}">
+            <input type="hidden" name="book_name" id="selectedBookName" value="{{ target_book.title }}">
+
+            <div class="input-group">
+                <label>ငွေလွှဲပြေစာ (Screenshot) တင်ပေးပါ</label>
+                <div class="file-upload-wrapper" id="uploadWrapper">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span id="uploadText">ဖိုင်ရွေးရန် နှိပ်ပါ သို့မဟုတ် ဆွဲထည့်ပါ</span>
+                    <input type="file" name="screenshot" id="screenshot-input" accept="image/*" required>
+                    <div id="file-name"></div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>KPay Name and Phone Number / Note</label>
+                <textarea name="note" rows="2" placeholder="ငွေလွှဲအကိုးအကား သို့မဟုတ် အချက်အလက်များ..."></textarea>
+            </div>
+            
+            <button type="submit" class="pay-btn">Confirm Payment</button>
+        </form>
+
+        <a href="{% url 'library' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Library</a>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('screenshot-input');
+        const fileNameDisplay = document.getElementById('file-name');
+        const uploadText = document.getElementById('uploadText');
+
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                fileNameDisplay.innerText = "Selected: " + this.files[0].name;
+                uploadText.innerText = "ဖိုင်ပြောင်းရန် နှိပ်ပါ";
+            }
+        });
+    </script>
+</body>
+</html>

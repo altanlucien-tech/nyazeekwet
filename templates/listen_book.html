@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audiobook - {{ book.title }}</title>
+    
+    {% load static %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Pyidaungsu&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-teal: #4da3af;
+            --glass-bg: rgba(15, 23, 42, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', 'Pyidaungsu', sans-serif; }
+
+        body {
+            min-height: 100vh;
+            background-image: url("/static/images/401f0a2abafc6569d1dbff12b3a8c5e5.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .listen-container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            padding: 40px 25px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        /* Book Cover */
+        .cover-wrapper {
+            width: 180px;
+            height: 260px;
+            margin: 0 auto 25px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 2px solid var(--glass-border);
+        }
+
+        .cover-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h2 { font-size: 22px; margin-bottom: 8px; font-weight: 600; }
+        .author { color: var(--primary-teal); font-size: 15px; margin-bottom: 30px; }
+
+        /* Audio Player Styling */
+        .player-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px 20px;
+            border-radius: 25px;
+            margin-bottom: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Custom Audio Controls Style */
+        .main-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .play-pause-btn {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: var(--primary-teal);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(77, 163, 175, 0.4);
+            transition: 0.3s;
+        }
+
+        .play-pause-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(77, 163, 175, 0.6);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 0 10px;
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Hidden Native Audio */
+        #audioPlayer {
+            display: none;
+        }
+
+        /* ရှေ့နောက်တိုးသည့် ခလုတ်များ */
+        .skip-controls { 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; 
+            margin-bottom: 0; 
+        }
+        
+        .skip-btn { 
+            background: rgba(255, 255, 255, 0.08); 
+            border: 1px solid var(--glass-border); 
+            color: white; 
+            width: 50px;
+            height: 50px;
+            border-radius: 50%; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .skip-btn i { font-size: 18px; }
+        .skip-btn span { font-size: 10px; margin-top: 2px; }
+        
+        .skip-btn:hover { 
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05); 
+        }
+        
+        .progress-info {
+            margin: 15px 0 15px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 18px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-teal);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .debug-panel {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            font-size: 12px;
+            text-align: left;
+            display: none;
+        }
+
+        .action-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-back {
+            background: var(--primary-teal);
+            color: white;
+            padding: 14px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: 0.3s;
+            display: block;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(77, 163, 175, 0.4);
+        }
+
+        @media (max-width: 400px) {
+            .listen-container { padding: 30px 20px; }
+            .cover-wrapper { width: 150px; height: 220px; }
+            h2 { font-size: 19px; }
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+    <div class="listen-container">
+        <div class="cover-wrapper">
+            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}">
+        </div>
+
+        <h2>{{ book.title }}</h2>
+        <p class="author">By {{ book.author }}</p>
+
+        <div class="player-container">
+            <div class="main-controls">
+                <button class="skip-btn" id="backwardBtn" title="10 စက္ကန့် နောက်ပြန်">
+                    <i class="fas fa-undo-alt"></i>
+                    <span>-10s</span>
+                </button>
+
+                <button class="play-pause-btn" id="playPauseBtn">
+                    <i class="fas fa-play" id="playIcon"></i>
+                </button>
+
+                <button class="skip-btn" id="forwardBtn" title="10 စက္ကန့် ရှေ့သို့">
+                    <i class="fas fa-redo-alt"></i>
+                    <span>+10s</span>
+                </button>
+            </div>
+            
+            <div class="progress-info" id="progressInfo">
+                <i class="fas fa-clock"></i> <span id="timeDisplay">0:00 / 0:00</span>
+            </div>
+
+            <div class="volume-control">
+                <i class="fas fa-volume-up" style="font-size: 14px; opacity: 0.8;"></i>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+            </div>
+            
+            <audio id="audioPlayer" preload="auto">
+                <source src="{% url 'audio_stream' book.id %}" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            
+            <div class="debug-panel" id="debugPanel">
+                <div>Audio Ready: <span id="debugReady">false</span></div>
+                <div>Current Time: <span id="debugTime">0</span></div>
+                <div>Last Saved: <span id="debugLast">0</span></div>
+                <div>Duration: <span id="debugDuration">0</span></div>
+            </div>
+        </div>
+
+        <div class="action-btns">
+            <a href="{% url 'library' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Library
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        const bookId = "{{ book.id }}";
+        const csrfToken = "{{ csrf_token }}";
+        const timeDisplay = document.getElementById('timeDisplay');
+        const backwardBtn = document.getElementById('backwardBtn');
+        const forwardBtn = document.getElementById('forwardBtn');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = document.getElementById('playIcon');
+        const volumeSlider = document.getElementById('volumeSlider');
+        
+        const debugReady = document.getElementById('debugReady');
+        const debugTime = document.getElementById('debugTime');
+        const debugLast = document.getElementById('debugLast');
+        const debugDuration = document.getElementById('debugDuration');
+        
+        let saveTimeout = null;
+        let lastSavedPosition = parseFloat("{{ last_position|default:0 }}");
+        let isAudioReady = false;
+        let retryCount = 0;
+        const MAX_RETRIES = 3;
+
+        function initAudio() {
+            audio.addEventListener('loadedmetadata', onAudioLoaded);
+            audio.addEventListener('canplay', onAudioCanPlay);
+            audio.addEventListener('error', onAudioError);
+            audio.addEventListener('waiting', onAudioWaiting);
+            audio.addEventListener('playing', onAudioPlaying);
+            audio.addEventListener('pause', onAudioPaused);
+            audio.addEventListener('seeking', onAudioSeeking);
+            audio.addEventListener('seeked', onAudioSeeked);
+            audio.load();
+        }
+
+        function onAudioLoaded() {
+            if (lastSavedPosition > 0 && lastSavedPosition < audio.duration) {
+                audio.currentTime = lastSavedPosition;
+            }
+            isAudioReady = true;
+            if (debugReady) debugReady.textContent = 'true';
+            if (debugDuration) debugDuration.textContent = audio.duration;
+            updateProgressInfo();
+        }
+
+        function onAudioCanPlay() {
+            isAudioReady = true;
+            if (debugReady) debugReady.textContent = 'true';
+        }
+
+        function onAudioError(e) {
+            if (retryCount < MAX_RETRIES) {
+                retryCount++;
+                setTimeout(() => audio.load(), 2000);
+            } else {
+                timeDisplay.textContent = 'Error loading audio';
+            }
+        }
+
+        function onAudioWaiting() {
+            timeDisplay.innerHTML = '<span class="loading"></span> Loading...';
+        }
+
+        function onAudioPlaying() {
+            playIcon.className = 'fas fa-pause';
+            updateProgressInfo();
+        }
+
+        function onAudioPaused() {
+            playIcon.className = 'fas fa-play';
+        }
+        
+        function onAudioSeeking() { console.log('Seeking...'); }
+        
+        function onAudioSeeked() { updateProgressInfo(); }
+
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play().catch(e => console.log('Play error:', e));
+            } else {
+                audio.pause();
+            }
+        }
+
+        function skipAudio(seconds) {
+            if (!isAudioReady) return;
+            const wasPlaying = !audio.paused;
+            let newTime = audio.currentTime + seconds;
+            if (newTime < 0) newTime = 0;
+            else if (audio.duration && newTime > audio.duration) newTime = audio.duration;
+            audio.currentTime = newTime;
+            if (wasPlaying) audio.play();
+            savePosition(newTime);
+            updateProgressInfo();
+        }
+
+        audio.ontimeupdate = function() {
+            updateProgressInfo();
+            if (debugTime) debugTime.textContent = audio.currentTime.toFixed(1);
+            if (saveTimeout) clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                if (audio.readyState >= 2) savePosition(audio.currentTime);
+            }, 2000);
+        };
+
+        audio.onended = function() {
+            savePosition(0);
+            updateProgressInfo();
+            playIcon.className = 'fas fa-play';
+        };
+
+        function savePosition(pos) {
+            if (Math.abs(pos - lastSavedPosition) < 1) return;
+            pos = Math.round(pos * 10) / 10;
+            fetch('/update-audio-position/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify({ book_id: bookId, position: pos })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    lastSavedPosition = pos;
+                    if (debugLast) debugLast.textContent = pos;
+                }
+            })
+            .catch(error => console.error('Error saving position:', error));
+        }
+
+        function updateProgressInfo() {
+            if (audio.duration && !isNaN(audio.duration) && audio.duration > 0) {
+                const current = formatTime(audio.currentTime);
+                const total = formatTime(audio.duration);
+                const percent = Math.round((audio.currentTime / audio.duration) * 100);
+                timeDisplay.textContent = `${current} / ${total} (${percent}%)`;
+            } else if (audio.readyState < 2) {
+                timeDisplay.innerHTML = '<span class="loading"></span> Loading...';
+            } else {
+                timeDisplay.textContent = '0:00 / 0:00';
+            }
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds < 0 || !isFinite(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        playPauseBtn.addEventListener('click', togglePlay);
+        backwardBtn.addEventListener('click', () => skipAudio(-10));
+        forwardBtn.addEventListener('click', () => skipAudio(10));
+        volumeSlider.addEventListener('input', (e) => audio.volume = e.target.value);
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') skipAudio(-10);
+            else if (e.key === 'ArrowRight') skipAudio(10);
+            else if (e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault();
+                togglePlay();
+            }
+        });
+
+        document.onkeydown = function(e) {
+            if (e.ctrlKey && (e.keyCode === 83 || e.keyCode === 85 || e.keyCode === 80 || e.keyCode === 73)) {
+                e.preventDefault();
+                return false;
+            }
+            if (e.keyCode === 123) return false;
+        };
+
+        if ('wakeLock' in navigator) {
+            navigator.wakeLock.request('screen').catch(err => {});
+        }
+
+        window.addEventListener('beforeunload', function() {
+            if (audio.readyState >= 2) savePosition(audio.currentTime);
+        });
+
+        initAudio();
+    </script>
+</body>
+</html>

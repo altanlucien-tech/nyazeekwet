@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nya Zee Kwet- Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+    <div class="mobile-container">
+        <div class="background-overlay"></div>
+
+        <div class="content">
+            <header>
+                <div class="top-bar animate-fade">
+                    <span>Nya Zee Kwet</span>
+                </div>
+                <h1 class="logo animate-down delay-1">Nya Zee Kwet</h1>
+                <h2 class="welcome-text animate-down delay-2">Welcome</h2>
+                <p class="subtitle animate-down delay-3">Where precision meets your pull is you. Start life to arrange now.</p>
+            </header>
+            
+            <a id="redirect-link" href="{% url 'library' %}" style="display:none;"></a>
+        </div>
+    </div>
+
+    <script>
+        // ၁၀ စက္ကန့် (10000ms) ပြည့်လျှင် library page သို့ သွားရန်
+        setTimeout(function() {
+            window.location.href = document.getElementById('redirect-link').href;
+        }, 7000);
+    </script>
+
+</body>
+</html>
+

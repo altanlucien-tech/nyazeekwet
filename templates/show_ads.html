@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watching Ad - JS Pro Library</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-teal: #4da3af;
+            --glass-bg: rgba(15, 23, 42, 0.8); 
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            height: 100vh;
+            background: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        .ad-container {
+            width: 90%;
+            max-width: 500px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            padding: 40px 20px;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .ad-space {
+            width: 100%;
+            height: 250px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px dashed #4da3af;
+            position: relative;
+        }
+
+        /* ဤနေရာတွင် Google Adsense သို့မဟုတ် အခြား Ad code များ ထည့်နိုင်သည် */
+        .ad-space::after {
+            content: "YOUR ADVERTISEMENT HERE";
+            color: #4da3af;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        .timer-circle {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--primary-teal);
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            font-size: 20px;
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .countdown-text {
+            font-size: 14px;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+        }
+
+        .btn-continue {
+            display: none; /* စက္ကန့်မပြည့်မချင်း ဖျောက်ထားမည် */
+            background: var(--primary-teal);
+            color: white;
+            text-decoration: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(77, 163, 175, 0.3);
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-continue:hover {
+            transform: translateY(-3px);
+            background: #3d8a96;
+        }
+
+        .premium-hint {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .premium-hint a {
+            color: var(--primary-teal);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ad-container">
+        <div id="loadingCircle" class="timer-circle">
+            <span id="seconds">5</span>
+        </div>
+        
+        <h3>ကျေးဇူးပြု၍ ခဏစောင့်ပါ...</h3>
+        <p class="countdown-text">ကြော်ငြာကြည့်ရှုပြီးလျှင် စာအုပ်ဖတ်လို့ရပါပြီ</p>
+
+        <div class="ad-space">
+            </div>
+
+        <a href="{{ next_url }}" id="continueBtn" class="btn-continue">
+            Continue to Read <i class="fas fa-arrow-right" style="margin-left: 10px;"></i>
+        </a>
+
+        <div class="premium-hint">
+            ကြော်ငြာမပါဘဲ ဖတ်ချင်ပါသလား? 
+            <br>
+            <a href="{% url 'payment' %}">Premium သို့ အဆင့်မြှင့်တင်ပါ။</a>
+        </div>
+    </div>
+
+    <script>
+        let timeLeft = 5;
+        const secondsSpan = document.getElementById('seconds');
+        const continueBtn = document.getElementById('continueBtn');
+        const loadingCircle = document.getElementById('loadingCircle');
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            secondsSpan.innerText = timeLeft;
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                loadingCircle.style.display = 'none';
+                continueBtn.style.display = 'block';
+                document.querySelector('h3').innerText = "အဆင်သင့်ဖြစ်ပါပြီ!";
+            }
+        }, 1000);
+
+        // လုံခြုံရေးအတွက် Back button တားဆီးခြင်း
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+        };
+    </script>
+</body>
+</html>

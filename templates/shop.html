@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Shop - JS Pro</title>
+    
+    {% load static %} 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-teal: #4da3af;
+            --glass-bg: rgba(15, 23, 42, 0.45); 
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --active-bg: rgba(77, 163, 175, 0.25);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            height: 100vh;
+            background-image: url("/static/images/401f0a2abafc6569d1dbff12b3a8c5e5.jpg"); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            overflow: hidden;
+        }
+
+        .glass-container {
+            width: 100%;
+            height: 100vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px); 
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .header {
+            padding: 15px 20px 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 100;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .menu-btn {
+            width: 45px; height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; z-index: 1100; transition: 0.3s;
+        }
+
+        .menu-btn div { width: 20px; height: 2px; background: white; margin: 2.5px 0; transition: 0.4s; border-radius: 2px; }
+        .menu-btn.open div:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .menu-btn.open div:nth-child(2) { opacity: 0; }
+        .menu-btn.open div:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+
+        .search-box {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px; padding: 10px 15px;
+            display: flex; align-items: center;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            transition: 0.3s;
+        }
+        .search-box input { background: none; border: none; color: white; margin-left: 10px; outline: none; width: 100%; font-size: 14px; }
+        .search-box input::placeholder { color: rgba(255, 255, 255, 0.6); }
+
+        .search-suggestions {
+            position: absolute;
+            top: 55px; left: 0; right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            z-index: 2000;
+            display: none;
+            list-style: none;
+            padding: 10px 0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .search-suggestions li { padding: 12px 20px; color: white; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .search-suggestions li:hover { background: rgba(77, 163, 175, 0.3); }
+
+        .nav-tabs-wrapper {
+            padding: 5px 20px 15px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .nav-tabs-wrapper::-webkit-scrollbar { display: none; }
+
+        .nav-tab {
+            padding: 8px 22px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-tab.active { background: var(--primary-teal); box-shadow: 0 4px 15px rgba(77, 163, 175, 0.3); }
+
+        .sidebar {
+            position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px);
+            padding: 25px; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000; border-right: 1px solid var(--glass-border);
+            display: flex; flex-direction: column;
+        }
+        .sidebar.active { left: 0; }
+        .sidebar a.cat-link { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: #cbd5e1; text-decoration: none; font-size: 14px; transition: 0.3s; border-radius: 12px; margin-bottom: 5px;}
+        .sidebar a.cat-link:hover, .sidebar a.cat-link.active { background: var(--active-bg); color: var(--primary-teal); transform: translateX(8px); }
+
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 999; opacity: 0; visibility: hidden; transition: 0.4s; backdrop-filter: blur(3px); }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        .scroll-area { flex-grow: 1; padding: 0 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding-bottom: 30px; }
+        
+        .book-card { 
+            background: rgba(255,255,255,0.08); 
+            border-radius: 20px; padding: 12px; 
+            border: 1px solid var(--glass-border); 
+            cursor: pointer; transition: 0.4s; 
+            position: relative;
+        }
+        .book-card:hover { transform: translateY(-10px); border-color: var(--primary-teal); }
+        .book-card img { width: 100%; height: 210px; object-fit: cover; border-radius: 15px; }
+        
+        .badge-purchased { position: absolute; top: 15px; right: 15px; background: #27ae60; color: white; font-size: 9px; padding: 4px 10px; border-radius: 12px; font-weight: bold; z-index: 5; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(12px); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .book-modal { 
+            background: rgba(15, 23, 42, 0.95); width: 100%; max-width: 450px; padding: 30px; 
+            border-radius: 30px; border: 1px solid var(--glass-border); text-align: center; color: white; 
+            max-height: 90vh; overflow-y: auto;
+        }
+        
+        .buy-btn, .read-btn { background: var(--primary-teal); color: white; border: none; padding: 14px 40px; border-radius: 30px; font-weight: 600; cursor: pointer; margin-top: 15px; width: 100%; transition: 0.3s; }
+        .listen-btn { background: #2e6b75; color: white; border: none; padding: 14px 40px; border-radius: 30px; font-weight: 600; cursor: pointer; margin-top: 10px; width: 100%; transition: 0.3s; }
+        .buy-btn:hover, .read-btn:hover, .listen-btn:hover { filter: brightness(1.1); transform: scale(1.02); }
+
+        .pagination-container { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 10px 0 60px; }
+        .page-btn { width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--glass-border); border-radius: 8px; color: white; text-decoration: none; transition: 0.3s;}
+        .page-btn:hover { background: rgba(77, 163, 175, 0.3); }
+        .page-btn.active { background: var(--primary-teal); font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div class="glass-container">
+        <div class="header">
+            <div class="menu-btn" id="menuBtn"><div></div><div></div><div></div></div>
+            <div class="search-box">
+                <form action="{% url 'shop' %}" method="GET" style="display: flex; width: 100%; align-items: center;">
+                    <i class="fas fa-search" style="color: #64748b;"></i>
+                    <input type="text" id="shopSearch" name="q" placeholder="Search in shop..." value="{{ search_query|default:'' }}" autocomplete="off">
+                    {% if current_category %}<input type="hidden" name="category" value="{{ current_category }}">{% endif %}
+                </form>
+                <ul id="suggestionList" class="search-suggestions"></ul>
+            </div>
+            <div class="right-section">
+                {% if user.is_authenticated %}
+                    <div class="icon-circle" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">{{ user.username|slice:":1"|upper }}</div>
+                {% else %}
+                    <a href="{% url 'login' %}" style="color: white; border: 1px solid var(--glass-border); border-radius: 50%; padding: 10px; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,0.1);"><i class="fas fa-user-lock"></i></a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="nav-tabs-wrapper">
+            <a href="{% url 'library' %}" class="nav-tab"><i class="fas fa-th-large"></i> Library</a>
+            <a href="{% url 'shop' %}" class="nav-tab active"><i class="fas fa-shopping-bag"></i> Shop</a>
+            <a href="{% url 'library' %}?type=manga" class="nav-tab"><i class="fas fa-bolt"></i> Manga</a>
+            <a href="{% url 'payment' %}" class="nav-tab"><i class="fas fa-crown"></i> Premium</a>
+        </div>
+
+        <div class="sidebar" id="sidebar">
+            <div style="margin-top: 40px;">
+                <p style="color: #64748b; font-size: 11px; margin-left: 15px; margin-bottom: 15px; font-weight: 600; letter-spacing: 1px;">EXPLORE</p>
+                
+                <a href="{% url 'shop' %}" class="cat-link {% if not current_category %}active{% endif %}">
+                    <i class="fas fa-border-all"></i> All Products
+                </a>
+
+                {% if user.is_authenticated %}
+                <a href="?category=My Books" class="cat-link {% if current_category == 'My Books' %}active{% endif %}" style="color: #ffcf33;">
+                    <i class="fas fa-star"></i> My Purchased
+                </a>
+                {% endif %}
+
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 10px;">
+                
+                <p style="color: #64748b; font-size: 11px; margin-left: 15px; margin-bottom: 15px; font-weight: 600; letter-spacing: 1px;">SHOP CATEGORIES</p>
+                
+                {% for cat in categories %}
+                    <a href="?category={{ cat.name }}" class="cat-link {% if current_category == cat.name %}active{% endif %}">
+                        <i class="fas fa-tag" style="font-size: 12px; opacity: 0.7;"></i> {{ cat.name }}
+                    </a>
+                {% endfor %}
+            </div>
+
+            <div style="margin-top: auto; padding-bottom: 30px;">
+                {% if user.is_authenticated %}
+                    <form action="{% url 'logout' %}" method="post" id="logout-form">{% csrf_token %}</form>
+                    <a href="#" onclick="document.getElementById('logout-form').submit();" class="cat-link" style="color: #ff5f5f;">
+                        <i class="fas fa-sign-out-alt"></i> Sign Out
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="cat-link"><i class="fas fa-sign-in-alt"></i> Login / Register</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="overlay" id="overlay"></div>
+
+        <div class="scroll-area">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
+                <h4 style="color: white; font-weight: 600;">{% if current_category %}{{ current_category }}{% else %}Digital Book Store{% endif %}</h4>
+                <span style="color: #64748b; font-size: 12px;">{{ books.paginator.count }} items</span>
+            </div>
+
+            <div class="book-grid">
+                {% for book in books %}
+                <div class="book-card" onclick="openShopModal('{{ book.id }}', '{{ book.title|escapejs }}', '{{ book.author|escapejs }}', '{{ book.description|escapejs }}', '{{ book.price }}', '{{ book.cover_image.url }}', '{% if book.id in purchased_ids %}true{% else %}false{% endif %}', '{% if book.audio_file %}true{% else %}false{% endif %}')">
+                    {% if book.id in purchased_ids %}<span class="badge-purchased"><i class="fas fa-check"></i> OWNED</span>{% endif %}
+                    <img src="{{ book.cover_image.url }}" alt="{{ book.title }}">
+                    <h5 style="color:white; margin-top:12px; font-weight: 400; font-size: 13px;">{{ book.title|truncatechars:35 }}</h5>
+                    <p style="color: var(--primary-teal); font-size: 13px; font-weight: 600; margin-top: 5px;">{{ book.price }} Ks</p>
+                </div>
+                {% empty %}
+                    <div style="grid-column: 1/-1; text-align: center; padding: 100px; color: #64748b;">No books found.</div>
+                {% endfor %}
+            </div>
+
+            {% if books.has_other_pages %}
+            <div class="pagination-container">
+                {% if books.has_previous %}
+                    <a href="?page={{ books.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" class="page-btn"><i class="fas fa-chevron-left"></i></a>
+                {% endif %}
+                
+                <span class="page-btn active">{{ books.number }}</span>
+                
+                {% if books.has_next %}
+                    <a href="?page={{ books.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="book-modal">
+            <div id="mCover" style="width: 140px; height: 200px; margin: 0 auto 20px; background-size: cover; background-position: center; border-radius: 15px; border: 1px solid var(--glass-border);"></div>
+            <h3 id="mTitle" style="font-size: 18px; margin-bottom: 5px;"></h3>
+            <p id="mAuthor" style="color: var(--primary-teal); font-size: 14px; margin-bottom: 15px;"></p>
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 20px;">
+                <p id="mDesc" style="font-size: 13px; color: #cbd5e1; line-height: 1.6; max-height: 120px; overflow-y: auto; text-align: left;"></p>
+            </div>
+            <div id="mPrice" style="font-weight: 600; font-size: 20px; margin-bottom: 10px; color: white;"></div>
+            <div id="btnArea"></div>
+            <button onclick="document.getElementById('modalOverlay').style.display='none'" style="background:none; border:none; color:#64748b; margin-top:15px; cursor:pointer; font-size:13px;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const modalOverlay = document.getElementById('modalOverlay');
+
+        function toggleMenu() {
+            menuBtn.classList.toggle('open');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+        menuBtn.onclick = toggleMenu;
+        overlay.onclick = toggleMenu;
+
+        function openShopModal(id, title, author, desc, price, cover, isBought, hasAudio) {
+            document.getElementById('mTitle').innerText = title;
+            document.getElementById('mAuthor').innerText = 'by ' + author;
+            document.getElementById('mDesc').innerText = desc && desc !== 'None' ? desc : "No description available.";
+            document.getElementById('mCover').style.backgroundImage = `url(${cover})`;
+            
+            const btnArea = document.getElementById('btnArea');
+            const mPrice = document.getElementById('mPrice');
+            const isPremium = "{{ is_premium|yesno:'true,false' }}";
+
+            if (isBought === 'true' || isPremium === 'true') {
+                mPrice.innerHTML = `<span style="color: #2ecc71; font-size: 15px;"><i class="fas fa-check-circle"></i> Access Granted</span>`;
+                let btns = `<button class="read-btn" onclick="location.href='/read/${id}/'">Read Now</button>`;
+                if (hasAudio === 'true') {
+                    btns += `<button class="listen-btn" onclick="location.href='/listen/${id}/'"><i class="fas fa-headphones"></i> Listen Audiobook</button>`;
+                }
+                btnArea.innerHTML = btns;
+            } else {
+                mPrice.innerText = price + " Ks";
+                btnArea.innerHTML = `<button class="buy-btn" onclick="location.href='/payment/?book_id=${id}'">Confirm Purchase</button>`;
+            }
+            modalOverlay.style.display = 'flex';
+        }
+
+        modalOverlay.onclick = e => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; };
+
+        // Search Suggestions (Shop Source Only)
+        const searchInput = document.getElementById('shopSearch');
+        const suggestionList = document.getElementById('suggestionList');
+        searchInput.addEventListener('input', async (e) => {
+            const term = e.target.value;
+            if (term.length > 1) {
+                try {
+                    const response = await fetch(`/search-suggestions/?term=${encodeURIComponent(term)}&source=shop`);
+                    const data = await response.json();
+                    suggestionList.innerHTML = '';
+                    if (data.length > 0) {
+                        suggestionList.style.display = 'block';
+                        data.forEach(item => {
+                            const li = document.createElement('li');
+                            li.textContent = `${item.title} (${item.author})`;
+                            li.onclick = () => { searchInput.value = item.title; suggestionList.style.display = 'none'; searchInput.form.submit(); };
+                            suggestionList.appendChild(li);
+                        });
+                    } else suggestionList.style.display = 'none';
+                } catch (error) { console.error('Search error:', error); }
+            } else suggestionList.style.display = 'none';
+        });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target)) suggestionList.style.display = 'none'; });
+
+        // Restore Security Scripts
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.ctrlKey && (e.keyCode === 83 || e.keyCode === 80 || e.keyCode === 85 || e.keyCode === 73 || (e.shiftKey && e.keyCode === 73))) {
+                return false;
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Shwe Taike</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+
+        body {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/static/images/401f0a2abafc6569d1dbff12b3a8c5e5.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh; /* height အစား min-height ကိုသုံးခြင်းက screen ရှည်လျှင် ပိုအဆင်ပြေစေသည် */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px; /* mobile အတွက် padding လျှော့ထားသည် */
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 40px 25px; /* mobile အတွက် padding ပြင်ထားသည် */
+            width: 95%; /* mobile တွင် ဘေးမကပ်စေရန် % ကိုသုံးသည် */
+            max-width: 400px; /* desktop အတွက် အကျယ်ဆုံးပမာဏ */
+            text-align: center;
+            color: white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        h1 { font-size: clamp(2rem, 8vw, 2.5rem); margin-bottom: 10px; font-weight: bold; } /* စာလုံးအရွယ်အစား screen အလိုက် ပြောင်းလဲမည် */
+        .subtitle { color: rgba(255, 255, 255, 0.8); margin-bottom: 30px; font-size: 0.9rem; line-height: 1.4; }
+
+        .input-group { margin-bottom: 20px; }
+        
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+            font-size: 1rem; /* mobile တွင် zoom မဝင်စေရန် ၁၆px/1rem သုံးသင့်သည် */
+        }
+
+        input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        input:focus { border-color: #52a8b3; background: rgba(255, 255, 255, 0.15); }
+
+        .options {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: left;
+        }
+        .options input { margin-right: 10px; width: 18px; height: 18px; }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: #52a8b3; 
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .login-btn:hover { background: #46919c; transform: translateY(-2px); }
+
+        .signup-text { font-size: 0.9rem; margin-bottom: 15px; }
+        .signup-text a { color: #52a8b3; text-decoration: none; font-weight: bold; }
+
+        .error-msg { color: #ff6b6b; background: rgba(255, 107, 107, 0.1); padding: 10px; border-radius: 10px; margin-bottom: 20px; font-size: 0.85rem; border: 1px solid rgba(255, 107, 107, 0.2); }
+        
+        .forgot-link { color: rgba(255, 255, 255, 0.6); text-decoration: none; font-size: 0.85rem; transition: 0.3s; display: inline-block; margin-top: 10px; }
+        .forgot-link:hover { color: #52a8b3; }
+
+        /* Tablet နှင့် Desktop အတွက် သီးသန့်ပြင်ဆင်ချက် */
+        @media (min-width: 768px) {
+            .login-container { padding: 40px 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>Login</h1>
+        <p class="subtitle">Welcome back please login to your account</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error-msg">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="input-group">
+                <input type="text" name="username" placeholder="User Name" required>
+            </div>
+            <div class="input-group">
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+
+            <div class="options">
+                <input type="checkbox" id="remember">
+                <label for="remember">Remember me</label>
+            </div>
+
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <p class="signup-text">Don't have an account? <a href="{% url 'register' %}">Signup</a></p>
+        <a href="{% url 'password_reset' %}" class="forgot-link">Forgot password?</a>     
+    </div>
+
+</body>
+</html>

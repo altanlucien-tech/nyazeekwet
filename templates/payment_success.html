@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ငွေလွှဲမှု အောင်မြင်ပါသည်</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Pyidaungsu', sans-serif; 
+        }
+        
+        body {
+            /* Screenshot ပါအတိုင်း နောက်ခံပုံ ထည့်ရန် (ပုံလမ်းကြောင်းကို လိုအပ်သလို ပြင်နိုင်သည်) */
+            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/static/images/401f0a2abafc6569d1dbff12b3a8c5e5.jpg"); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .glass-card {
+            /* အမှောင်ဘက်သန်းသော Glass effect */
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 50px 30px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+
+        .check-icon {
+            width: 85px;
+            height: 85px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 45px;
+            font-weight: bold;
+        }
+
+        h2 { 
+            margin-bottom: 20px; 
+            font-weight: 700; 
+            letter-spacing: 0.5px;
+            font-size: 24px;
+        }
+
+        p { 
+            line-height: 1.8; 
+            margin-bottom: 40px; 
+            color: rgba(255, 255, 255, 0.85); 
+            font-size: 16px; 
+        }
+
+        .btn {
+            background: #4EA8B7; /* ခလုတ်အဖြူရောင် */
+            color: #ffffff; /* စာလုံးအရောင် အမိုက်ဘက် */
+            padding: 15px 40px;
+            border-radius: 50px; /* Pill shape */
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            display: block; /* အကျယ်အပြည့်ယူရန် */
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Responsive ပြင်ဆင်ချက်များ */
+        @media (max-width: 480px) {
+            .glass-card {
+                padding: 40px 20px;
+            }
+            .check-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 35px;
+            }
+            h2 { font-size: 20px; }
+            p { font-size: 14px; }
+            .btn { font-size: 16px; padding: 12px 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <div class="check-icon">✓</div>
+        <h2>ငွေလွှဲမှု အောင်မြင်ပါသည်</h2>
+        <p>
+            သင်တင်လိုက်သော ငွေလွှဲပြေစာအား Admin မှ အမြန်ဆုံး စစ်ဆေးပေးပါမည်။ <br>
+            စစ်ဆေးပြီးပါက စာအုပ်များကို စိတ်ကြိုက်ဖတ်ရှုနိုင်ပါပြီ။
+        </p>
+        <a href="{% url 'library' %}" class="btn">Library သို့ ပြန်သွားရန်</a>
+    </div>
+
+</body>
+</html>

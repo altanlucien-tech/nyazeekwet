@@ -1,0 +1,104 @@
+:root {
+    --text-white: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #050a14;
+    overflow: hidden;
+}
+
+.mobile-container {
+    width: 100%;
+    max-width: 450px;
+    height: 100vh;
+    position: relative;
+    background-image: url('../images/nya_zee_kwet.png'); 
+    background-size: cover;
+    background-position: center;
+}
+
+.background-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.85));
+    z-index: 1;
+}
+
+.content {
+    position: relative;
+    z-index: 2;
+    padding: 60px 30px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Animation Styling --- */
+
+.animate-down {
+    opacity: 0;
+    transform: translateY(-30px);
+    animation: slideDown 1s ease forwards;
+}
+
+.animate-fade {
+    opacity: 0;
+    animation: fadeIn 1.5s ease forwards;
+}
+
+/* တစ်ခုချင်းစီ အချိန်ကွာပြီး ပေါ်လာစေရန် */
+.delay-1 { animation-delay: 0.5s; }
+.delay-2 { animation-delay: 1.2s; }
+.delay-3 { animation-delay: 2.0s; }
+
+@keyframes slideDown {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    to { opacity: 0.8; }
+}
+
+/* စာသား အလှအပများ */
+.logo {
+    font-size: 35px;
+    color: var(--text-white);
+    margin-top: 20px;
+    font-weight: 600;
+}
+
+.welcome-text {
+    font-size: 45px;
+    font-weight: 300;
+    color: var(--text-white);
+    margin-top: 5px;
+}
+
+.subtitle {
+    font-size: 15px;
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin-top: 25px;
+    max-width: 300px;
+}
+
+.top-bar {
+    color: white;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
