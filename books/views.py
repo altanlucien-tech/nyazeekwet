@@ -2,7 +2,6 @@ import requests
 import os
 import json
 import time
-import io # Google Drive streaming အတွက် အသစ်ထည့်ထားပါသည်
 from pathlib import Path
 from dotenv import load_dotenv
 from django.conf import settings
@@ -17,11 +16,6 @@ from django.db.models import Q
 from django.http import JsonResponse, FileResponse, Http404
 from django.contrib.auth import authenticate, login as auth_login
 from django.views.decorators.csrf import csrf_exempt
-
-# Google API Libraries (အသစ်ထည့်ထားပါသည်)
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaIoBaseDownload
 
 # Model များအား Error မတက်စေရန် Try-Except ဖြင့် Import လုပ်ခြင်း
 try:
@@ -38,19 +32,6 @@ except ImportError:
     HISTORY_EXISTS = False
 
 load_dotenv()
-
-# --- Google Drive Helper Function (အကောင့် ၃ ခု လှည့်သုံးရန်) ---
-def get_drive_service(account_index):
-    """account_index (0, 1, 2) အလိုက် Google Drive Service ကို ခေါ်ယူသည်"""
-    SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
-    # credentials folder ထဲမှာ acc0.json, acc1.json, acc2.json ဆိုပြီး ရှိရပါမယ်
-    json_path = os.path.join(settings.BASE_DIR, 'credentials', f'acc{account_index}.json')
-    
-    if not os.path.exists(json_path):
-        return None
-        
-    creds = service_account.Credentials.from_service_account_file(json_path, scopes=SCOPES)
-    return build('drive', 'v3', credentials=creds)
 
 def welcome_page(request):
     """ကြိုဆိုသည့် Page"""
@@ -110,7 +91,6 @@ def library_view(request):
         all_items = Manga.objects.all().order_by('-id') if Manga else []
         header_title = "Manga Collection"
     else:
-        # Shop အတွက်မဟုတ်သော စာအုပ်များကိုသာ Library တွင်ပြရန်
         categories = Category.objects.filter(is_manga=False, is_for_shop=False) if CATEGORY_EXISTS else []
         all_items = Book.objects.filter(is_for_sale=False).order_by('-id')
         header_title = "Book Store"
@@ -149,11 +129,7 @@ def shop_view(request):
     """ရောင်းရန်စာအုပ်များကြည့်ရန်"""
     category_slug = request.GET.get('category') 
     search_query = request.GET.get('q') 
-    
-    # Shop Category သီးသန့်
     categories = Category.objects.filter(is_for_shop=True) if CATEGORY_EXISTS else []
-    
-    # ရောင်းရန်စာအုပ်များကိုသာယူရန်
     all_items = Book.objects.filter(is_for_sale=True).order_by('-id')
 
     purchased_ids = []
@@ -191,10 +167,14 @@ def shop_view(request):
     })
 
 def show_ads_before_read(request):
+    """ကြော်ငြာပြရန် View"""
     next_url = request.GET.get('next')
+    if not next_url:
+        return redirect('library')
     return render(request, 'show_ads.html', {'next_url': next_url})
 
 def read_book(request, book_id):
+    """စာအုပ်ဖတ်ရန် Logic (Ad Redirect ပါဝင်သည်)"""
     book = get_object_or_404(Book, id=book_id)
 
     if request.user.is_authenticated and HISTORY_EXISTS and History:
@@ -219,6 +199,7 @@ def read_book(request, book_id):
         can_access = True
 
     if can_access:
+        # Ad Logic: Free user ဖြစ်ပြီး ad မပြရသေးလျှင် Ad page သို့ ပို့မည်
         if book.is_free and not is_premium_user and not request.GET.get('ad_shown'):
             return redirect(f'/show-ads/?next=/read/{book.id}/?ad_shown=true')
 
@@ -228,27 +209,8 @@ def read_book(request, book_id):
             if prog: last_page = prog.last_pdf_page
 
         try:
-            # --- Google Drive Logic ဖြည့်စွက်ချက် ---
-            drive_id = getattr(book, 'drive_file_id', None)
-            acc_index = getattr(book, 'drive_account_index', 0)
-
-            if drive_id:
-                service = get_drive_service(acc_index)
-                if service:
-                    drive_request = service.files().get_media(fileId=drive_id)
-                    fh = io.BytesIO()
-                    downloader = MediaIoBaseDownload(fh, drive_request)
-                    done = False
-                    while done is False:
-                        status, done = downloader.next_chunk()
-                    fh.seek(0)
-                    response = FileResponse(fh, content_type='application/pdf')
-                else:
-                    raise Http404("Google Drive Service မရနိုင်ပါ။")
-            else:
-                # မူလ Code အတိုင်း Local မှ ဖတ်ခြင်း
-                response = FileResponse(open(book.pdf_file.path, 'rb'), content_type='application/pdf')
-            
+            response = FileResponse(open(book.pdf_file.path, 'rb'), content_type='application/pdf')
+            # 'inline' ထားမှသာ Browser ထဲမှာ တိုက်ရိုက်ပွင့်မည်
             response['Content-Disposition'] = f'inline; filename="{book.title}.pdf"#page={last_page}'
             return response
         except FileNotFoundError: raise Http404("စာအုပ်ဖိုင် ရှာမတွေ့ပါ။")
@@ -261,6 +223,7 @@ def read_book(request, book_id):
             return redirect(f'/payment/?book_id={book.id}')
 
 def read_chapter(request, chapter_id):
+    """Manga Chapter ဖတ်ရန် Logic (Ad Redirect ပါဝင်သည်)"""
     chapter = get_object_or_404(Chapter, id=chapter_id)
     is_premium_user = False
     if request.user.is_authenticated:
@@ -271,25 +234,10 @@ def read_chapter(request, chapter_id):
         messages.warning(request, "ဤအပိုင်းကိုဖတ်ရန် Premium ဝယ်ယူပါ။")
         return redirect('payment')
 
+    # Ad Logic: Chapter က Premium မဟုတ်ဘဲ user ကလည်း Premium မဟုတ်လျှင်
     if not chapter.is_premium and not is_premium_user and not request.GET.get('ad_shown'):
         return redirect(f'/show-ads/?next=/manga/chapter/{chapter.id}/?ad_shown=true')
 
-    # --- Google Drive Logic for Chapter ---
-    drive_id = getattr(chapter, 'drive_file_id', None)
-    acc_index = getattr(chapter, 'drive_account_index', 0)
-    
-    if drive_id:
-        service = get_drive_service(acc_index)
-        if service:
-            drive_request = service.files().get_media(fileId=drive_id)
-            fh = io.BytesIO()
-            downloader = MediaIoBaseDownload(fh, drive_request)
-            done = False
-            while done is False:
-                status, done = downloader.next_chunk()
-            fh.seek(0)
-            return FileResponse(fh, content_type='application/pdf')
-            
     return FileResponse(open(chapter.pdf_file.path, 'rb'), content_type='application/pdf')
 
 def manga_chapters_api(request, manga_id):
@@ -298,23 +246,20 @@ def manga_chapters_api(request, manga_id):
     return JsonResponse(chapters, safe=False)
 
 def book_search_suggestions(request):
-    """Search Suggestion ပေးရန် API (Library နှင့် Shop ခွဲပေးထားပါသည်)"""
+    """Search Suggestion API"""
     query = request.GET.get('term', '') 
-    source = request.GET.get('source', '') # library or shop
+    source = request.GET.get('source', '') 
     suggestions = []
     
     if query:
         books = Book.objects.filter(Q(title__icontains=query) | Q(author__icontains=query))
-        
         if source == 'shop':
             books = books.filter(is_for_sale=True)
         elif source == 'library':
             books = books.filter(is_for_sale=False)
-            
         books = books[:5]
         for book in books:
             suggestions.append({'title': book.title, 'author': str(book.author)})
-            
     return JsonResponse(suggestions, safe=False)
 
 def send_telegram_notification(user, note, photo_path):
@@ -352,7 +297,6 @@ def payment_page(request):
                 send_telegram_notification(request.user.username, msg, payment.screenshot.path)
             except: pass
         return render(request, 'payment_success.html')
-    
     return render(request, 'payment.html', {'target_book': target_book})
 
 @login_required
@@ -366,7 +310,6 @@ def listen_book(request, book_id):
     if can_listen:
         prog = UserProgress.objects.filter(user=request.user, book=book).first()
         return render(request, 'listen_book.html', {'book': book, 'last_position': prog.last_audio_position if prog else 0})
-    
     messages.warning(request, "Audiobook နားထောင်ရန် ဝယ်ယူရန် သို့မဟုတ် Premium ဝယ်ယူပါ။")
     return redirect(f'/payment/?book_id={book.id}')
 
@@ -379,25 +322,6 @@ def audio_stream(request, book_id):
         can_stream = True
 
     if can_stream and book.audio_file:
-        # --- Google Drive Logic for Audio ---
-        drive_id = getattr(book, 'drive_audio_id', None)
-        acc_index = getattr(book, 'drive_account_index', 0)
-        
-        if drive_id:
-            service = get_drive_service(acc_index)
-            if service:
-                drive_request = service.files().get_media(fileId=drive_id)
-                fh = io.BytesIO()
-                downloader = MediaIoBaseDownload(fh, drive_request)
-                done = False
-                while done is False:
-                    status, done = downloader.next_chunk()
-                fh.seek(0)
-                response = FileResponse(fh, content_type='audio/mpeg')
-                response['Accept-Ranges'] = 'bytes'
-                return response
-
-        # မူလ Code အတိုင်း Local မှ ဖတ်ခြင်း
         response = FileResponse(open(book.audio_file.path, 'rb'), content_type='audio/mpeg')
         response['Accept-Ranges'] = 'bytes'
         return response

@@ -51,7 +51,6 @@
             position: relative;
         }
 
-        /* ဤနေရာတွင် Google Adsense သို့မဟုတ် အခြား Ad code များ ထည့်နိုင်သည် */
         .ad-space::after {
             content: "YOUR ADVERTISEMENT HERE";
             color: #4da3af;
@@ -86,7 +85,7 @@
         }
 
         .btn-continue {
-            display: none; /* စက္ကန့်မပြည့်မချင်း ဖျောက်ထားမည် */
+            display: none;
             background: var(--primary-teal);
             color: white;
             text-decoration: none;
@@ -98,6 +97,7 @@
             border: none;
             cursor: pointer;
             width: 100%;
+            text-align: center;
         }
 
         .btn-continue:hover {
@@ -127,10 +127,9 @@
         <h3>ကျေးဇူးပြု၍ ခဏစောင့်ပါ...</h3>
         <p class="countdown-text">ကြော်ငြာကြည့်ရှုပြီးလျှင် စာအုပ်ဖတ်လို့ရပါပြီ</p>
 
-        <div class="ad-space">
-            </div>
+        <div class="ad-space"></div>
 
-        <a href="{{ next_url }}" id="continueBtn" class="btn-continue">
+        <a href="{{ next_url }}" id="continueBtn" class="btn-continue" target="_blank" onclick="handleContinue()">
             Continue to Read <i class="fas fa-arrow-right" style="margin-left: 10px;"></i>
         </a>
 
@@ -149,7 +148,7 @@
 
         const timer = setInterval(() => {
             timeLeft--;
-            secondsSpan.innerText = timeLeft;
+            if(secondsSpan) secondsSpan.innerText = timeLeft;
 
             if (timeLeft <= 0) {
                 clearInterval(timer);
@@ -159,10 +158,17 @@
             }
         }, 1000);
 
-        // လုံခြုံရေးအတွက် Back button တားဆီးခြင်း
+        function handleContinue() {
+            // စာအုပ်ဖတ်ရန် နှိပ်လိုက်သည်နှင့် ဤ Page ကို Home (Library) သို့ ပြောင်းလဲထားမည်
+            setTimeout(() => {
+                window.location.href = "{% url 'library' %}";
+            }, 500);
+        }
+
+        // Back button နှိပ်လျှင်လည်း Home သို့သာ ပြန်ပို့မည်
         history.pushState(null, null, location.href);
         window.onpopstate = function () {
-            history.go(1);
+            window.location.href = "{% url 'library' %}";
         };
     </script>
 </body>

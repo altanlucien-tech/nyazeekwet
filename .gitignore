@@ -1,2 +1,24 @@
 # .gitignore ဖိုင်ထဲမှာ
-credentials/*.json
+credentials/*.js
+
+# Environments
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Database
+db.sqlite3
+
+# Media & Static (Optional - only if you want to keep them local)
+media/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

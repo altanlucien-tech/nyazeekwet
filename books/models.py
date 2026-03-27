@@ -2,8 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
-import os # ဖိုင်လမ်းကြောင်း စစ်ရန်အတွက် ထည့်သွင်းထားပါသည်
-from .utils import upload_to_drive # Drive သို့ တင်ပေးမည့် function ကို ခေါ်ယူခြင်း
+import os  # ဖိုင်လမ်းကြောင်း စစ်ရန်အတွက် ထည့်သွင်းထားပါသည်
+from .utils import upload_to_drive  # Drive သို့ တင်ပေးမည့် function ကို ခေါ်ယူခြင်း
 
 # Category ကို Book ရဲ့ အပေါ်သို့ ရွှေ့လိုက်သည် (ForeignKey Error မတက်စေရန်)
 class Category(models.Model):
