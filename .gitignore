@@ -7,6 +7,11 @@ credentials/*.js
 # Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+.env
 
 # Database
 db.sqlite3
@@ -22,3 +27,4 @@ media/
 .Trashes
 ehthumbs.db
 Thumbs.db
+

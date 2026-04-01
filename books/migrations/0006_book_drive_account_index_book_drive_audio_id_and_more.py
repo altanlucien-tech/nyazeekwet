@@ -6,23 +6,35 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('books', '0005_alter_chapter_options_alter_purchasedbook_options_and_more'),
+        ("books", "0005_alter_chapter_options_alter_purchasedbook_options_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='book',
-            name='drive_account_index',
-            field=models.IntegerField(default=0, help_text='ဘယ်အကောင့်ကို သုံးမလဲ (0, 1, 2)'),
+            model_name="book",
+            name="drive_account_index",
+            field=models.IntegerField(
+                default=0, help_text="ဘယ်အကောင့်ကို သုံးမလဲ (0, 1, 2)"
+            ),
         ),
         migrations.AddField(
-            model_name='book',
-            name='drive_audio_id',
-            field=models.CharField(blank=True, help_text='Google Drive File ID (Audio)', max_length=255, null=True),
+            model_name="book",
+            name="drive_audio_id",
+            field=models.CharField(
+                blank=True,
+                help_text="Google Drive File ID (Audio)",
+                max_length=255,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='book',
-            name='drive_file_id',
-            field=models.CharField(blank=True, help_text='Google Drive File ID (PDF)', max_length=255, null=True),
+            model_name="book",
+            name="drive_file_id",
+            field=models.CharField(
+                blank=True,
+                help_text="Google Drive File ID (PDF)",
+                max_length=255,
+                null=True,
+            ),
         ),
     ]

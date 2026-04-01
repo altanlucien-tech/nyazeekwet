@@ -1,6 +1,6 @@
 import os
-from django.conf import settings
 
+from django.conf import settings
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -23,7 +23,9 @@ def _get_drive_service(account_index: int):
     return build("drive", "v3", credentials=creds)
 
 
-def upload_to_drive(local_path: str, filename: str, account_index: int = 0) -> str | None:
+def upload_to_drive(
+    local_path: str, filename: str, account_index: int = 0
+) -> str | None:
     """
     Local ဖိုင်တစ်ဖိုင်ကို Google Drive သို့ upload လုပ်၍ file ID ကို ပြန်ပေးမည်။
     credentials/acc{index}.json တွေ သေချာရှိဖို့လိုသည်။
@@ -38,4 +40,3 @@ def upload_to_drive(local_path: str, filename: str, account_index: int = 0) -> s
     request = service.files().create(body=file_metadata, media_body=media, fields="id")
     file = request.execute()
     return file.get("id")
-

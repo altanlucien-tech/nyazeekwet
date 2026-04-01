@@ -8,102 +8,114 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('books', '0004_alter_book_options_alter_manga_options_and_more'),
+        ("books", "0004_alter_book_options_alter_manga_options_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='chapter',
+            name="chapter",
             options={},
         ),
         migrations.AlterModelOptions(
-            name='purchasedbook',
+            name="purchasedbook",
             options={},
         ),
         migrations.RenameField(
-            model_name='purchasedbook',
-            old_name='purchase_date',
-            new_name='purchased_at',
+            model_name="purchasedbook",
+            old_name="purchase_date",
+            new_name="purchased_at",
         ),
         migrations.AlterUniqueTogether(
-            name='userprogress',
+            name="userprogress",
             unique_together=set(),
         ),
         migrations.RemoveField(
-            model_name='book',
-            name='is_real_book',
+            model_name="book",
+            name="is_real_book",
         ),
         migrations.RemoveField(
-            model_name='chapter',
-            name='created_at',
+            model_name="chapter",
+            name="created_at",
         ),
         migrations.RemoveField(
-            model_name='manga',
-            name='created_at',
+            model_name="manga",
+            name="created_at",
         ),
         migrations.RemoveField(
-            model_name='payment',
-            name='book',
+            model_name="payment",
+            name="book",
         ),
         migrations.RemoveField(
-            model_name='payment',
-            name='status',
+            model_name="payment",
+            name="status",
         ),
         migrations.AddField(
-            model_name='category',
-            name='is_for_shop',
+            model_name="category",
+            name="is_for_shop",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='payment',
-            name='is_approved',
+            model_name="payment",
+            name="is_approved",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='book',
-            name='audio_file',
-            field=models.FileField(blank=True, null=True, upload_to='protected_audio/'),
+            model_name="book",
+            name="audio_file",
+            field=models.FileField(blank=True, null=True, upload_to="protected_audio/"),
         ),
         migrations.AlterField(
-            model_name='book',
-            name='category',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='books.category'),
+            model_name="book",
+            name="category",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="books.category",
+            ),
         ),
         migrations.AlterField(
-            model_name='chapter',
-            name='chapter_number',
+            model_name="chapter",
+            name="chapter_number",
             field=models.IntegerField(),
         ),
         migrations.AlterField(
-            model_name='chapter',
-            name='title',
+            model_name="chapter",
+            name="title",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='manga',
-            name='author',
+            model_name="manga",
+            name="author",
             field=models.CharField(max_length=200),
         ),
         migrations.AlterField(
-            model_name='manga',
-            name='category',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='books.category'),
+            model_name="manga",
+            name="category",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="books.category",
+            ),
         ),
         migrations.AlterField(
-            model_name='manga',
-            name='title',
+            model_name="manga",
+            name="title",
             field=models.CharField(max_length=200),
         ),
         migrations.AlterField(
-            model_name='payment',
-            name='note',
-            field=models.TextField(blank=True, default=''),
+            model_name="payment",
+            name="note",
+            field=models.TextField(blank=True, default=""),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='purchasedbook',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="purchasedbook",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

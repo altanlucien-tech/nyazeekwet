@@ -6,20 +6,20 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('books', '0006_book_drive_account_index_book_drive_audio_id_and_more'),
+        ("books", "0006_book_drive_account_index_book_drive_audio_id_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='book',
-            name='drive_account_index',
+            model_name="book",
+            name="drive_account_index",
         ),
         migrations.RemoveField(
-            model_name='book',
-            name='drive_audio_id',
+            model_name="book",
+            name="drive_audio_id",
         ),
         migrations.RemoveField(
-            model_name='book',
-            name='drive_file_id',
+            model_name="book",
+            name="drive_file_id",
         ),
     ]

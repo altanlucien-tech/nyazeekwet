@@ -14,40 +14,48 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
+
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.urls import include, path
 
 urlpatterns = [
     # admin.site.urls ဟု မှန်ကန်စွာ ပြင်ဆင်ပေးထားပါသည်
-    path('admin/', admin.site.urls),
-    
-    path('', include('books.urls')),
-    
+    path("admin/", admin.site.urls),
+    path("", include("books.urls")),
     # Password Reset Done path ကို ပြန်လည်ထည့်သွင်းပေးထားပါသည်
-    path('password-reset/done/', 
-         auth_views.PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'), 
-         name='password_reset_done'),
-    
+    path(
+        "password-reset/done/",
+        auth_views.PasswordResetDoneView.as_view(
+            template_name="registration/password_reset_done.html"
+        ),
+        name="password_reset_done",
+    ),
     # Reset Link အလုပ်လုပ်ရန် ဤ URL သည် အရေးကြီးပါသည်
-    path('password-reset-confirm/<uidb64>/<token>/', 
-         auth_views.PasswordResetConfirmView.as_view(template_name='registration/password_reset_confirm.html'), 
-         name='password_reset_confirm'),
-    
-    path('password-reset-complete/', 
-         auth_views.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'), 
-         name='password_reset_complete'),
-
-    path('password-reset/', 
-         auth_views.PasswordResetView.as_view(
-             template_name='registration/password_reset_form.html',
-         ), 
-         name='password_reset'),
+    path(
+        "password-reset-confirm/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name="registration/password_reset_confirm.html"
+        ),
+        name="password_reset_confirm",
+    ),
+    path(
+        "password-reset-complete/",
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name="registration/password_reset_complete.html"
+        ),
+        name="password_reset_complete",
+    ),
+    path(
+        "password-reset/",
+        auth_views.PasswordResetView.as_view(
+            template_name="registration/password_reset_form.html",
+        ),
+        name="password_reset",
+    ),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
