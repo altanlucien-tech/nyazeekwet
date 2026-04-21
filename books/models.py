@@ -4,6 +4,7 @@ from datetime import timedelta
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from cloudinary.models import CloudinaryField
 
 from .utils import \
     upload_to_drive  # Drive သို့ တင်ပေးမည့် function ကို ခေါ်ယူခြင်း
@@ -37,8 +38,8 @@ class Author(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=200)
-    cover_image = models.ImageField(upload_to="covers/")
-    pdf_file = models.FileField(upload_to="protected_books/")
+    cover_image = CloudinaryField('image')
+    pdf_file = CloudinaryField('raw', resource_type='raw')
     description = models.TextField(blank=True)
     is_free = models.BooleanField(
         default=True

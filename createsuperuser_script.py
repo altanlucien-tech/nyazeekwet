@@ -1,14 +1,17 @@
 import os
 import django
 from django.contrib.auth import get_user_model
+from dotenv import load_dotenv
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Shwe_Taike.settings')
 django.setup()
 
+load_dotenv()
+
 User = get_user_model()
 username = 'admin'
 email = 'admin@example.com'
-password = 'n&L8#vK2zP!mQ5*X'
+password = os.getenv('admin_password')
 
 if not User.objects.filter(username=username).exists():
     User.objects.create_superuser(username, email, password)
