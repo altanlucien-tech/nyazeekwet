@@ -112,7 +112,7 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT =   os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static")
@@ -153,9 +153,9 @@ EMAIL_HOST_PASSWORD = os.getenv("Email_Secret_Key")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('cloud_name'),
-    'API_KEY': os.getenv('api_key'),
-    'API_SECRET': os.getenv('api_secret')
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET')
 }
 
 STORAGES = {
@@ -166,6 +166,8 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.StaticCloudinaryStorage",
     },
 }
+
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticCloudinaryStorage'
 
 # ပုံများကို Cloudinary တွင် သိမ်းရန်
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

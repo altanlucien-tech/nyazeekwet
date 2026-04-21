@@ -11,7 +11,7 @@ load_dotenv()
 User = get_user_model()
 username = 'admin'
 email = 'admin@example.com'
-password = os.getenv('admin_password')
+password = os.getenv('ADMIN_PASSWORD')
 
 if not User.objects.filter(username=username).exists():
     User.objects.create_superuser(username, email, password)
