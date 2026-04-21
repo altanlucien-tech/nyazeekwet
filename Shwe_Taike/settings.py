@@ -158,5 +158,14 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.getenv('api_secret')
 }
 
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "cloudinary_storage.storage.StaticCloudinaryStorage",
+    },
+}
+
 # ပုံများကို Cloudinary တွင် သိမ်းရန်
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
