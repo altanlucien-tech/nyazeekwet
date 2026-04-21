@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upgrade Plan - Glassmorphism</title>
+    <title>Payment</title>
+    {% load static %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
@@ -12,7 +13,8 @@
         body {
             min-height: 100vh;
             display: flex; justify-content: center; align-items: center;
-            background-image: url("/static/images/401f0a2abafc6569d1dbff12b3a8c5e5.jpg"); 
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+                url("{% static 'images/401f0a2abafc6569d1dbff12b3a8c5e5.jpg' %}");
             background-size: cover; background-position: center;
             padding: 20px;
         }

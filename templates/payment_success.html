@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
     <title>ငွေလွှဲမှု အောင်မြင်ပါသည်</title>
     <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -15,7 +16,8 @@
         
         body {
             /* Screenshot ပါအတိုင်း နောက်ခံပုံ ထည့်ရန် (ပုံလမ်းကြောင်းကို လိုအပ်သလို ပြင်နိုင်သည်) */
-            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/static/images/401f0a2abafc6569d1dbff12b3a8c5e5.jpg"); 
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+                url("{% static 'images/401f0a2abafc6569d1dbff12b3a8c5e5.jpg' %}"); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
