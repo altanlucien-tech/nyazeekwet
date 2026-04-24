@@ -393,7 +393,7 @@
 
         let currentId = "", isFreeBook = false;
 
-        async function openPreview(title, author, cover, pdf, desc, isFree, itemId, hasAudio, type) {
+        async function openPreview(title, author, cover, pdfUrl, desc, isFree, itemId, hasAudio, type) {
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalAuthor').innerText = author;
             document.getElementById('modalDescription').innerText = desc && desc !== "None" ? desc : "No description available.";
@@ -457,8 +457,11 @@
 
         document.getElementById('readBtn').onclick = () => {
             const isPremiumUser = "{{ is_premium|yesno:'true,false' }}";
-            if (isFreeBook || isPremiumUser === "true") window.location.href = `/read/${currentId}/`;
-            else window.location.href = "{% url 'payment' %}";
+            if (isFreeBook || isPremiumUser === "true") {
+                window.location.href = `/read/${currentId}/`;
+            } else {
+                window.location.href = "{% url 'payment' %}";
+            }
         };
 
         document.getElementById('listenBtn').onclick = () => {

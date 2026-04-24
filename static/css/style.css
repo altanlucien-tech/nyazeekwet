@@ -1,4 +1,4 @@
-{% load static %} 
+
 :root {
     --text-white: #ffffff;
 }
@@ -24,7 +24,7 @@ body {
     max-width: 450px;
     height: 100vh;
     position: relative;
-    background-image: url("{% static 'images/nya_zee_kwet.png' %}"); 
+    background-image: url("../images/nya_zee_kwet.png");
     background-size: cover;
     background-position: center;
 }
