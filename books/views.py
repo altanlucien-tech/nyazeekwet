@@ -265,7 +265,7 @@ def read_book(request, book_id):
 
         try:
             response = redirect(f"{book.pdf_file.url}#page={last_page}")
-            )
+            
             # 'inline' ထားမှသာ Browser ထဲမှာ တိုက်ရိုက်ပွင့်မည်
             response["Content-Disposition"] = (
                 f'inline; filename="{book.title}.pdf"#page={last_page}'
