@@ -18,7 +18,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.http import url_has_allowed_host_and_scheme
 from dotenv import load_dotenv
-from ratelimit.decorators import ratelimit
+from django_ratelimit.decorators import ratelimit
 from .models import Book, Payment, UserProgress, UserSubscription
 
 # Model များအား Error မတက်စေရန် Try-Except ဖြင့် Import လုပ်ခြင်း
