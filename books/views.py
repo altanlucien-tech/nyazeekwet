@@ -16,8 +16,9 @@ from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.http import url_has_allowed_host_and_scheme
 from dotenv import load_dotenv
-
+from ratelimit.decorators import ratelimit
 from .models import Book, Payment, UserProgress, UserSubscription
 
 # Model များအား Error မတက်စေရန် Try-Except ဖြင့် Import လုပ်ခြင်း
@@ -42,19 +43,28 @@ def welcome_page(request):
     """ကြိုဆိုသည့် Page"""
     return render(request, "welcome.html")
 
-
+@ratelimit(key='ip', rate='3/3m', method='POST', block=True)
 def login_view(request):
     """Login ဝင်ရန် Logic"""
     if request.method == "POST":
         uname = request.POST.get("username")
         p1 = request.POST.get("password")
         user = authenticate(username=uname, password=p1)
+        
         if user is not None:
             auth_login(request, user)
             messages.success(request, f"Welcome back, {uname}!")
             return redirect("library")
         else:
             messages.error(request, "Username သို့မဟုတ် Password မှားယွင်းနေပါသည်။")
+            
+    if user:
+        auth_login(request, user)
+        # Redirect အတွက် လုံခြုံရေး စစ်ဆေးခြင်း
+        next_url = request.GET.get('next')
+        if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+            return redirect(next_url)
+        return redirect('library')
     return render(request, "login.html")
 
 
@@ -254,8 +264,7 @@ def read_book(request, book_id):
                 last_page = prog.last_pdf_page
 
         try:
-            response = FileResponse(
-                open(book.pdf_file.path, "rb"), content_type="application/pdf"
+            response = redirect(f"{book.pdf_file.url}#page={last_page}")
             )
             # 'inline' ထားမှသာ Browser ထဲမှာ တိုက်ရိုက်ပွင့်မည်
             response["Content-Disposition"] = (
@@ -299,9 +308,7 @@ def read_chapter(request, chapter_id):
     ):
         return redirect(f"/show-ads/?next=/manga/chapter/{chapter.id}/?ad_shown=true")
 
-    return FileResponse(
-        open(chapter.pdf_file.path, "rb"), content_type="application/pdf"
-    )
+    return redirect(chapter.pdf_file.url)
 
 
 def manga_chapters_api(request, manga_id):
@@ -389,10 +396,11 @@ def listen_book(request, book_id):
 
     if can_listen:
         prog = UserProgress.objects.filter(user=request.user, book=book).first()
+        audio_url = book.audio_file.url if book.audio_file else None
         return render(
             request,
             "listen_book.html",
-            {"book": book, "last_position": prog.last_audio_position if prog else 0},
+            {"book": book, "audio_url": audio_url, "last_position": prog.last_audio_position if prog else 0},
         )
     messages.warning(
         request, "Audiobook နားထောင်ရန် ဝယ်ယူရန် သို့မဟုတ် Premium ဝယ်ယူပါ။"

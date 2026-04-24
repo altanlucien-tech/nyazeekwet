@@ -266,7 +266,7 @@
             </div>
             
             <audio id="audioPlayer" preload="auto">
-                <source src="{% url 'audio_stream' book.id %}" type="audio/mpeg">
+                <source src="{{ audio_url }}" type="audio/mpeg">
                 Your browser does not support the audio element.
             </audio>
             
